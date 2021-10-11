@@ -4,9 +4,9 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket         = "trififormstate"
-    key            = "global/s3/terraform.tfstate"
-    region         = "eu-west-2"
+    bucket = "trififormstate"
+    key = "global/s3/terraform.tfstate"
+    region = "eu-west-2"
     dynamodb_table = "trifitable"
   }
 }
@@ -17,7 +17,7 @@ module "vpc" {
   name = "trifi-vpc"
   cidr = "10.0.0.0/16"
 
-  azs             = [
+  azs = [
     "eu-west-2a",
     "eu-west-2b"
   ]
@@ -25,14 +25,14 @@ module "vpc" {
     "10.0.1.0/24",
     "10.0.2.0/24"
   ]
-  public_subnets  = [
+  public_subnets = [
     "10.0.101.0/24",
     "10.0.102.0/24"
   ]
 
 
   tags = {
-    Terraform   = "true"
+    Terraform = "true"
     Environment = "dev"
   }
 }
@@ -46,9 +46,9 @@ module "ec2_sg" {
 
   ingress_with_cidr_blocks = [
     {
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
+      from_port = 22
+      to_port = 22
+      protocol = "tcp"
       cidr_blocks = "0.0.0.0/0"
     }
   ]
@@ -56,7 +56,7 @@ module "ec2_sg" {
 
 
 module "asg" {
-  source  = "terraform-aws-modules/autoscaling/aws"
+  source = "terraform-aws-modules/autoscaling/aws"
   version = "~> 4.0"
 
   name = "ec2-autoscaling-group"
@@ -64,24 +64,58 @@ module "asg" {
   vpc_zone_identifier = module.vpc.private_subnets
 
   # Create both the autoscaling group and launch template:
-  use_lt    = true
+  use_lt = true
   create_lt = true
 
-  min_size                  = 0
-  max_size                  = 2
-  desired_capacity          = 2
+  min_size = 0
+  max_size = 2
+  desired_capacity = 2
   wait_for_capacity_timeout = 0
-  health_check_type         = "EC2"
+  health_check_type = "EC2"
 
-  image_id      = data.aws_ami.amazon_linux.id
+  image_id = data.aws_ami.amazon_linux.id
   instance_type = "t2.small"
+
+  # the IAM Instance profile (?) to launch the instance with:
+  iam_instance_profile_arn = aws_iam_instance_profile.asg-iam-ip.arn
+
+  # the security groups that will be linked to ec2 instances:
+  security_groups = [
+    module.ec2_sg.security_group_id
+  ]
 }
 
+resource "aws_iam_instance_profile" "asg-iam-ip" {
+  name = "asg-iam-instance-profile"
+  role = aws_iam_role.asg-iam-role.name
+}
+
+resource "aws_iam_role" "asg-iam-role" {
+  name = "asg-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.asg_iam_policy_doc.json
+}
+
+
+data "aws_iam_policy_document" "asg_iam_policy_doc" {
+  statement {
+    actions = [
+      "sts:AssumeRole"
+    ]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "ec2.amazonaws.com"
+      ]
+    }
+  }
+}
 
 data "aws_ami" "amazon_linux" {
   most_recent = true
 
-  owners = ["amazon"]
+  owners = [
+    "amazon"]
 
   filter {
     name = "name"
