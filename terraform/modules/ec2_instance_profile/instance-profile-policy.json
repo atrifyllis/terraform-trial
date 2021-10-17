@@ -26,6 +26,21 @@
       "Resource": [
         "${app_log_group_arn}"
       ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": "ec2-instance-connect:SendSSHPublicKey",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:osuser": "ec2-user"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": "ec2:DescribeInstances",
+      "Resource": "*"
     }
   ]
 }

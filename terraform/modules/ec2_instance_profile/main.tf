@@ -1,8 +1,10 @@
 resource "aws_iam_instance_profile" "asg-iam-ip" {
   name = "asg-iam-instance-profile"
   role = aws_iam_role.asg-iam-role.name
+
 }
 
+# ssm.amazonaws.com is needed for ec2-instance-connect
 resource "aws_iam_role" "asg-iam-role" {
   name               = "asg-iam-role"
   assume_role_policy = <<EOF
@@ -13,7 +15,7 @@ resource "aws_iam_role" "asg-iam-role" {
       "Sid": "",
       "Effect": "Allow",
       "Principal": {
-        "Service": "ec2.amazonaws.com"
+        "Service": ["ec2.amazonaws.com", "ssm.amazonaws.com"]
       },
       "Action": "sts:AssumeRole"
     }
