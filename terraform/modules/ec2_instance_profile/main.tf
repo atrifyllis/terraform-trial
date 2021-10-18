@@ -40,5 +40,5 @@ data "template_file" "instance_profile_file" {
 }
 
 resource "aws_cloudwatch_log_group" "ec2_log_group" {
-  name = "ec2_log_group/app"
+  name = "ec2-log-group/app"
 }

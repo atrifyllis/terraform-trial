@@ -1,5 +1,5 @@
 resource "aws_autoscaling_group" "ecs_asg" {
-  name = "ecs_asg"
+  name = "ecs-asg"
 
   vpc_zone_identifier = var.subnet_ids
 
@@ -8,13 +8,13 @@ resource "aws_autoscaling_group" "ecs_asg" {
   }
 
   min_size         = 1
-  max_size         = 1
-  desired_capacity = 1
+  max_size         = 2
+  desired_capacity = 2
 
 }
 
 resource "aws_launch_template" "ecs_launch_template" {
-  name = "ecs_launch_template"
+  name = "ecs-launch-template"
 
   key_name      = "ec2-par" # ssh key created outside of terraform
   image_id      = data.aws_ami.ecs_optimized_ami.id
@@ -32,11 +32,11 @@ resource "aws_launch_template" "ecs_launch_template" {
   #   install ec2 instance connect
   user_data = filebase64("${path.module}/launch_template_user_data.sh")
 
-  #  vpc_security_group_ids = [aws_security_group.instance_sg.id] conflicts with network_interfaces
+  update_default_version = true
 }
 
 resource "aws_security_group" "instance_sg" {
-  name        = "instance_security_group"
+  name        = "instance-security-group"
   description = "controls direct access to application instances"
   vpc_id      = var.vpc_id
 
@@ -48,12 +48,25 @@ resource "aws_security_group" "instance_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+# IMPORTANT! this is how we connect asg with alb!
+resource "aws_autoscaling_attachment" "asg_alb_attachment" {
+  autoscaling_group_name = aws_autoscaling_group.ecs_asg.id
+  alb_target_group_arn   = var.alb_target_group_arn
 }
 
 

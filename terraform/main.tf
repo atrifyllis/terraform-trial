@@ -60,7 +60,6 @@ module "ec2_sg" {
   ]
 }
 
-
 module "asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "~> 4.0"
@@ -186,7 +185,6 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 #  }
 #
 #}
-
 
 resource "aws_ecs_service" "spring-boot-service" {
   name            = "spring-boot-service"
