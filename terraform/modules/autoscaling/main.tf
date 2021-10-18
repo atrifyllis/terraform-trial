@@ -65,7 +65,7 @@ resource "aws_security_group" "instance_sg" {
 
 # IMPORTANT! this is how we connect asg with alb!
 resource "aws_autoscaling_attachment" "asg_alb_attachment" {
-  autoscaling_group_name = aws_autoscaling_group.ecs_asg.id
+  autoscaling_group_name = aws_autoscaling_group.ecs_asg.name
   alb_target_group_arn   = var.alb_target_group_arn
 }
 
