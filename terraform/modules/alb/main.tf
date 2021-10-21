@@ -15,6 +15,8 @@ resource "aws_alb_target_group" "ecs_alb_target_group" {
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 
+  deregistration_delay = 10
+
   health_check {
     healthy_threshold   = 3
     unhealthy_threshold = 3
