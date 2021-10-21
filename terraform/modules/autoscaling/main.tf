@@ -18,7 +18,7 @@ resource "aws_launch_template" "ecs_launch_template" {
 
   key_name      = "ec2-par" # ssh key created outside of terraform
   image_id      = data.aws_ami.ecs_optimized_ami.id
-  instance_type = "t2.small"
+  instance_type = "t2.micro"
 
   network_interfaces {
     associate_public_ip_address = true

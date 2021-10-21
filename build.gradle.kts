@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 plugins {
     id("org.springframework.boot") version "2.5.5"
@@ -32,4 +33,11 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.getByName<BootBuildImage>("bootBuildImage") {
+    imageName = "otinanism/terraform-trial"
+    environment = mapOf(
+        "BPE_APPEND_JAVA_TOOL_OPTIONS" to " -XX:ReservedCodeCacheSize=80M"
+    )
 }
