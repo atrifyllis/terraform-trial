@@ -1,0 +1,23 @@
+[
+  {
+    "cpu": 256,
+    "essential": true,
+    "image": "${image_url}",
+    "memory": 1024,
+    "name": "${container_name}",
+    "portMappings": [
+      {
+        "containerPort": ${container_port},
+        "hostPort": ${container_port}
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${log_group_name}",
+        "awslogs-region": "${log_group_region}",
+        "awslogs-stream-prefix": "ecs"
+      }
+    }
+  }
+]

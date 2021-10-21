@@ -10,7 +10,9 @@
         "ecs:Poll",
         "ecs:RegisterContainerInstance",
         "ecs:Submit*",
-        "ecs:StartTelemetrySession"
+        "ecs:StartTelemetrySession",
+        "ecs:CreateCluster",
+        "ecs:StartTask"
       ],
       "Resource": [
         "*"
@@ -20,12 +22,11 @@
       "Sid": "allowLoggingToCloudWatch",
       "Effect": "Allow",
       "Action": [
+        "logs:CreateLogGroup",
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ],
-      "Resource": [
-        "${app_log_group_arn}"
-      ]
+      "Resource": "*"
     },
     {
       "Effect": "Allow",

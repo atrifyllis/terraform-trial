@@ -29,11 +29,13 @@ resource "aws_launch_template" "ecs_launch_template" {
     arn = var.instance_profile_arn
   }
 
-  #   install ec2 instance connect
-  user_data = filebase64("${path.module}/launch_template_user_data.sh")
+  # IMPORTANT!   install ec2 instance connect (optional)
+  # and register instances to the correct ecs cluster!!!! otherwise asg will register them in default cluster
+  user_data = base64encode(data.template_file.launch_template_user_data.rendered)
 
   update_default_version = true
 }
+
 
 resource "aws_security_group" "instance_sg" {
   name        = "instance-security-group"
@@ -49,8 +51,8 @@ resource "aws_security_group" "instance_sg" {
   }
 
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = var.container_port
+    to_port     = var.container_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -69,6 +71,14 @@ resource "aws_autoscaling_attachment" "asg_alb_attachment" {
   alb_target_group_arn   = var.alb_target_group_arn
 }
 
+
+data "template_file" "launch_template_user_data" {
+  template = file("${path.module}/launch_template_user_data.sh")
+
+  vars = {
+    cluster_name = var.ecs_cluster_name
+  }
+}
 
 data "aws_ami" "ecs_optimized_ami" {
   owners = ["amazon"]

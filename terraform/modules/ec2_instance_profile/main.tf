@@ -30,7 +30,8 @@ resource "aws_iam_role_policy" "instance_profile_policy" {
   policy = data.template_file.instance_profile_file.rendered
 }
 
-
+# could not restrict permission for logs to specific resources
+# counter-intuitive policies, where the ec2 instance must have ecs policies
 data "template_file" "instance_profile_file" {
   template = file("${path.module}/instance-profile-policy.json")
 
@@ -39,6 +40,7 @@ data "template_file" "instance_profile_file" {
   }
 }
 
+
 resource "aws_cloudwatch_log_group" "ec2_log_group" {
-  name = "ec2-log-group/app"
+  name = var.log_group
 }

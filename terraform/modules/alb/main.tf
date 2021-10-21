@@ -8,9 +8,10 @@ resource "aws_alb" "ecs_load_balancer" {
 
 }
 
+
 resource "aws_alb_target_group" "ecs_alb_target_group" {
   name     = "ecs-load-balancer-target-group"
-  port     = 80
+  port     = var.container_port
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 
@@ -19,14 +20,15 @@ resource "aws_alb_target_group" "ecs_alb_target_group" {
     unhealthy_threshold = 3
     timeout             = 5
     interval            = 10
-    path                = "/"
-    port                = 80
+    path                = "/hello"
+    port                = var.container_port
   }
 }
 
+
 resource "aws_alb_listener" "ecs_alb_listener" {
   load_balancer_arn = aws_alb.ecs_load_balancer.arn
-  port              = 80
+  port              = var.alb_port
   protocol          = "HTTP"
 
   default_action {
@@ -42,8 +44,8 @@ resource "aws_security_group" "alb_sg" {
   vpc_id = var.vpc_id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = var.alb_port
+    to_port     = var.alb_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

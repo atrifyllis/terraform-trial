@@ -7,3 +7,9 @@ variable "instance_profile_arn" {
 }
 
 variable "alb_target_group_arn" {}
+
+variable "container_port" {}
+
+
+variable "ecs_cluster_name" {
+}
