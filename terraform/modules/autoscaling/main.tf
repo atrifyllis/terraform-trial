@@ -7,7 +7,7 @@ resource "aws_autoscaling_group" "ecs_asg" {
     id = aws_launch_template.ecs_launch_template.id
   }
 
-  min_size         = 1
+  min_size         = 0 # 0 allows to first kill containers then create new ones in new deployment
   max_size         = 2
   desired_capacity = 2
 
