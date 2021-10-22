@@ -13,3 +13,8 @@ variable "container_port" {
 variable "alb_port" {
   default = 80
 }
+
+
+variable "name_prefix" {
+  default = "dev-boot"
+}
