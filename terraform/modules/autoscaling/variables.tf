@@ -13,3 +13,11 @@ variable "container_port" {}
 
 variable "ecs_cluster_name" {
 }
+
+variable "prefix" {
+}
+
+variable "ssh_key_name" {
+}
+variable "instance_type" {
+}

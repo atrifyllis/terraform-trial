@@ -1,5 +1,5 @@
 resource "aws_autoscaling_group" "ecs_asg" {
-  name = "ecs-asg"
+  name = "${var.prefix}-ecs-asg"
 
   vpc_zone_identifier = var.subnet_ids
 
@@ -13,12 +13,13 @@ resource "aws_autoscaling_group" "ecs_asg" {
 
 }
 
-resource "aws_launch_template" "ecs_launch_template" {
-  name = "ecs-launch-template"
 
-  key_name      = "ec2-par" # ssh key created outside of terraform
+resource "aws_launch_template" "ecs_launch_template" {
+  name = "${var.prefix}-ecs-launch-template"
+
+  key_name      = var.ssh_key_name # ssh key created outside of terraform
   image_id      = data.aws_ami.ecs_optimized_ami.id
-  instance_type = "t2.micro"
+  instance_type = var.instance_type
 
   network_interfaces {
     associate_public_ip_address = true
@@ -38,7 +39,7 @@ resource "aws_launch_template" "ecs_launch_template" {
 
 
 resource "aws_security_group" "instance_sg" {
-  name        = "instance-security-group"
+  name        = "${var.prefix}-instance-security-group"
   description = "controls direct access to application instances"
   vpc_id      = var.vpc_id
 

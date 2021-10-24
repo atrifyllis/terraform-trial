@@ -7,3 +7,9 @@ variable "subnet_ids" {
 variable "container_port" {}
 
 variable "alb_port" {}
+
+variable "prefix" {
+}
+
+variable "health_check_path" {
+}
