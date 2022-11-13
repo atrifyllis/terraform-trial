@@ -1,0 +1,19 @@
+IMPORTANT!
+before running terraform apply:
+
+----
+helm repo add eks https://aws.github.io/eks-charts
+helm repo update
+----
+
+the created lb policy seems to be needed to be added manually to the node (EC2) roles!
+
+the service type for alb to work is NodePort!
+
+tag duplication issue not solved
+
+set context to aws eks cluster:
+----
+aws eks --region $(terraform output -raw region) update-kubeconfig \
+--name $(terraform output -raw cluster_name)
+----

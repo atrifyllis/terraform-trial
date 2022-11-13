@@ -1,3 +1,4 @@
+
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "18.30.0"
@@ -6,12 +7,13 @@ module "eks" {
   cluster_version = "1.23"
 
   vpc_id     = var.vpc_id
-  subnet_ids = var.private_subnets
+  subnet_ids = var.public_subnets
 
   eks_managed_node_group_defaults = {
     ami_type = "AL2_x86_64"
 
-    attach_cluster_primary_security_group = true
+#     this causes problems with duplicate tags
+#    attach_cluster_primary_security_group = true
 
     # Disabling and using externally provided security groups
     create_security_group = false
@@ -23,6 +25,7 @@ module "eks" {
 
       instance_types = ["t3.small"]
       capacity_type  = "SPOT"
+      spot_allocation_strategy= "capacity-optimized"
 
       min_size     = 2
       max_size     = 2
