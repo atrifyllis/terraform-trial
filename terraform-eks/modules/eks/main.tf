@@ -23,7 +23,7 @@ module "eks" {
     one = {
       name = "node-group-1"
 
-      instance_types = ["t3.small"]
+      instance_types = ["t3.micro"]
       capacity_type  = "SPOT"
       spot_allocation_strategy= "capacity-optimized"
 
