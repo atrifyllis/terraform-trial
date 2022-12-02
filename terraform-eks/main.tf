@@ -31,9 +31,9 @@ resource "aws_security_group" "node_group_one" {
   }
 
   ingress {
-    from_port = 9443
-    to_port   = 9443
-    protocol  = "tcp"
+    from_port   = 9443
+    to_port     = 9443
+    protocol    = "tcp"
     description = "Allow access from control plane to webhook port of AWS load balancer controller"
     cidr_blocks = [
       "10.0.0.0/8",
@@ -50,11 +50,29 @@ module "eks" {
   public_subnets    = module.vpc.public_subnets
 }
 
+# Links Kubernetes Ingresses with AWS ALBs
 module "alb-controller" {
   source            = "./modules/alb-controller"
   oidc_provider_arn = module.eks.oidc_provider_arn
   vpc_id            = module.vpc.vpc_id
   eks_name          = module.eks.cluster_name
+}
+
+# Links AWS ALBs with Route53 host zones.
+module "external_dns" {
+  source = "git::https://github.com/DNXLabs/terraform-aws-eks-external-dns.git"
+
+  cluster_name                     = module.eks.cluster_id
+  cluster_identity_oidc_issuer     = module.eks.cluster_oidc_issuer_url
+  cluster_identity_oidc_issuer_arn = module.eks.oidc_provider_arn
+
+  settings = {
+    "policy" = "sync" # Modify how DNS records are sychronized between sources and providers.
+  }
+}
+
+module "certificate" {
+  source = "./modules/certificate"
 }
 
 # needed to create service account (at least)

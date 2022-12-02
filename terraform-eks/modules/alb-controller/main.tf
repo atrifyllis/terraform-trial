@@ -32,9 +32,9 @@ resource "helm_release" "lb" {
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
   namespace  = "kube-system"
-    depends_on = [
-      kubernetes_service_account.aws-load-balancer-controller-service-account
-    ]
+  depends_on = [
+    kubernetes_service_account.aws-load-balancer-controller-service-account
+  ]
 
   set {
     name  = "region"
@@ -66,3 +66,56 @@ resource "helm_release" "lb" {
     value = var.eks_name
   }
 }
+
+
+#resource "kubernetes_ingress_v1" "dummy-ingress" {
+#  metadata {
+#    name = "dummy-ingress"
+#    annotations = {
+#      "ingress.kubernetes.io/ssl-redirect": "false"
+#      # share a single ALB with all ingress rules with search-app-ingress
+#      "alb.ingress.kubernetes.io/group.name": "senik"
+#      # by default the alb is internal!!!:
+#      "alb.ingress.kubernetes.io/scheme": "internet-facing"
+#      "kubernetes.io/ingress.class": "alb"
+#
+#    }
+#  }
+##  wait_for_load_balancer = true
+#  spec {
+#    default_backend {
+#      service {
+#        name = "kubernetes"
+#        port {
+#          number = 80
+#        }
+#      }
+#    }
+#  }
+#}
+#
+#resource "kubernetes_ingress_v1" "dummy-ingress2" {
+#  metadata {
+#    name = "dummy-ingress2"
+#    annotations = {
+#      "ingress.kubernetes.io/ssl-redirect": "false"
+#      # share a single ALB with all ingress rules with search-app-ingress
+#      "alb.ingress.kubernetes.io/group.name": "senik"
+#      # by default the alb is internal!!!:
+#      "alb.ingress.kubernetes.io/scheme": "internet-facing"
+#      "kubernetes.io/ingress.class": "alb"
+#
+#    }
+#  }
+##  wait_for_load_balancer = true
+#  spec {
+#    default_backend {
+#      service {
+#        name = "kubernetes"
+#        port {
+#          number = 80
+#        }
+#      }
+#    }
+#  }
+#}

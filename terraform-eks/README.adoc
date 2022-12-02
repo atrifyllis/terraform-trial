@@ -13,7 +13,14 @@ the service type for alb to work is NodePort!
 tag duplication issue not solved
 
 set context to aws eks cluster:
+
 ----
 aws eks --region $(terraform output -raw region) update-kubeconfig \
 --name $(terraform output -raw cluster_name)
 ----
+
+----
+helm install senik-ui-dev senik-ui/ --values=senik-ui/values-dev.yaml
+----
+
+--set allowedOrigins= http://$(kubectl get ingress dummy-ingress -o=jsonpath="{'http://'}{.status.loadBalancer.ingress[].hostname}{'\n'}"),basePath=http://$(kubectl get ingress dummy-ingress -o=jsonpath="{'http://'}{.status.loadBalancer.ingress[].hostname}{'\n'}"):8081
