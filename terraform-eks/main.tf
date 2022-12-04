@@ -71,8 +71,22 @@ module "external_dns" {
   }
 }
 
+# creates LetsEncrypt certificate and links it with Route53 host zone
 module "certificate" {
-  source = "./modules/certificate"
+  source           = "./modules/certificate"
+  common_name      = var.common_name
+  lets_encrypt_url = var.lets_encrypt_url
+}
+
+# ebs to pvc
+module "ebs_csi_driver_controller" {
+  source  = "DrFaust92/ebs-csi-driver/kubernetes"
+  version = "3.5.0"
+
+  ebs_csi_controller_image                   = ""
+  ebs_csi_controller_role_name               = "ebs-csi-driver-controller"
+  ebs_csi_controller_role_policy_name_prefix = "ebs-csi-driver-policy"
+  oidc_url                                   = module.eks.cluster_oidc_issuer_url
 }
 
 # needed to create service account (at least)
