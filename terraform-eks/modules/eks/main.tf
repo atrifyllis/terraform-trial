@@ -22,13 +22,13 @@ module "eks" {
     one = {
       name = "node-group-1"
 
-      instance_types           = ["t3.micro"]
+      instance_types           = ["t3.small"]
       capacity_type            = "SPOT"
       spot_allocation_strategy = "capacity-optimized"
 
-      min_size     = 3
-      max_size     = 3
-      desired_size = 3
+      min_size     = 2
+      max_size     = 2
+      desired_size = 2
 
       pre_bootstrap_user_data = <<-EOT
       echo 'foo bar'
