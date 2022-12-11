@@ -1,0 +1,121 @@
+apiVersion: kops.k8s.io/v1alpha2
+kind: Cluster
+metadata:
+  creationTimestamp: "2022-12-07T06:44:13Z"
+  name: dev.senik.tk
+spec:
+  api:
+    dns: {}
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudProvider: aws
+  configBase: s3://alxeks1kops/kops.senik.tk
+  etcdClusters:
+  - cpuRequest: 200m
+    etcdMembers:
+    - encryptedVolume: true
+      instanceGroup: master-us-east-1a
+      name: a
+    memoryRequest: 100Mi
+    name: main
+  - cpuRequest: 100m
+    etcdMembers:
+    - encryptedVolume: true
+      instanceGroup: master-us-east-1a
+      name: a
+    memoryRequest: 100Mi
+    name: events
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+    useServiceAccountExternalPermissions: true
+  kubelet:
+    anonymousAuth: false
+  kubernetesApiAccess:
+  - 0.0.0.0/0
+  - ::/0
+  kubernetesVersion: 1.25.4
+  masterPublicName: api.kops.senik.tk
+  networkCIDR: 10.0.0.0/16 # custom vpc!
+#  networkID: vpc-042a28002b1b86979
+  networking:
+    kubenet: {}
+  nonMasqueradeCIDR: 100.64.0.0/10
+  serviceAccountIssuerDiscovery:
+    discoveryStore: s3://alxeks1kopsoidcstore/kops.senik.tk/discovery/kops.senik.tk
+    enableAWSOIDCProvider: true
+  sshAccess:
+  - 0.0.0.0/0
+  - ::/0
+  subnets:
+#  - cidr: 172.20.32.0/19
+#    name: us-east-1a
+#    type: Public
+#    zone: us-east-1a
+  - cidr: 10.0.4.0/24
+    name: ecs-vpc-public-us-east-1a
+    type: Public
+    zone: us-east-1a
+#    id: subnet-0afd68448d88d5890
+  - cidr: 10.0.5.0/24
+    name: ecs-vpc-public-us-east-1b
+    type: Public
+    zone: us-east-1b
+#    id: subnet-05e842ae1db3e4d23 # id is needed to use existing subnet. otherwise kops tries to create it
+  topology:
+    dns:
+      type: Public
+    masters: public
+    nodes: public
+  awsLoadBalancerController:
+    enabled: true
+  certManager:
+    enabled: true
+  externalDns:
+    provider: external-dns
+    watchIngress: true
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: dev.senik.tk
+  name: master-us-east-1a
+spec:
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20221018
+  instanceMetadata:
+    httpPutResponseHopLimit: 3
+    httpTokens: required
+  machineType: t3.small
+  maxSize: 1
+  minSize: 1
+  role: Master
+  subnets:
+    - ecs-vpc-public-us-east-1a
+  spotAllocationStrategy: lowest-price
+  maxPrice: "0.007"
+---
+
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: dev.senik.tk
+  name: nodes-us-east-1a
+spec:
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20221018
+  instanceMetadata:
+    httpPutResponseHopLimit: 1
+    httpTokens: required
+  machineType: t3.small
+  maxSize: 2
+  minSize: 2 # ebs-csi-controller won't start with one node
+  role: Node
+  subnets:
+    - ecs-vpc-public-us-east-1b
+#  spotAllocationStrategy: lowest-price
+#  maxPrice: "0.009"
