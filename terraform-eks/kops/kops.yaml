@@ -37,8 +37,7 @@ spec:
   - ::/0
   kubernetesVersion: 1.25.4
   masterPublicName: api.kops.senik.tk
-  networkCIDR: 10.0.0.0/16 # custom vpc!
-#  networkID: vpc-042a28002b1b86979
+  networkCIDR: 10.0.0.0/16 # use custom vpc
   networking:
     kubenet: {}
   nonMasqueradeCIDR: 100.64.0.0/10
@@ -49,20 +48,14 @@ spec:
   - 0.0.0.0/0
   - ::/0
   subnets:
-#  - cidr: 172.20.32.0/19
-#    name: us-east-1a
-#    type: Public
-#    zone: us-east-1a
   - cidr: 10.0.4.0/24
     name: ecs-vpc-public-us-east-1a
     type: Public
     zone: us-east-1a
-#    id: subnet-0afd68448d88d5890
   - cidr: 10.0.5.0/24
-    name: ecs-vpc-public-us-east-1b
+    name: ecs-vpc-public-us-east-1f
     type: Public
-    zone: us-east-1b
-#    id: subnet-05e842ae1db3e4d23 # id is needed to use existing subnet. otherwise kops tries to create it
+    zone: us-east-1f
   topology:
     dns:
       type: Public
@@ -71,7 +64,7 @@ spec:
   awsLoadBalancerController:
     enabled: true
   certManager:
-    enabled: true
+    enabled: true #  AWS Load Balancer Controller requires that cert manager is enabled
   externalDns:
     provider: external-dns
     watchIngress: true
@@ -97,6 +90,7 @@ spec:
     - ecs-vpc-public-us-east-1a
   spotAllocationStrategy: lowest-price
   maxPrice: "0.007"
+
 ---
 
 apiVersion: kops.k8s.io/v1alpha2
@@ -105,7 +99,7 @@ metadata:
   creationTimestamp: null
   labels:
     kops.k8s.io/cluster: dev.senik.tk
-  name: nodes-us-east-1a
+  name: nodes-us-east-1f
 spec:
   image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20221018
   instanceMetadata:
@@ -116,6 +110,6 @@ spec:
   minSize: 2 # ebs-csi-controller won't start with one node
   role: Node
   subnets:
-    - ecs-vpc-public-us-east-1b
-#  spotAllocationStrategy: lowest-price
-#  maxPrice: "0.009"
+    - ecs-vpc-public-us-east-1f
+  spotAllocationStrategy: lowest-price
+  maxPrice: "0.009" # us-east-1f has higher price than 1a

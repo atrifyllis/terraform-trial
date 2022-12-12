@@ -2,7 +2,6 @@ provider "aws" {
   region = var.aws_region
 }
 
-
 terraform {
   backend "s3" {
     bucket         = "alxeks1state"
@@ -11,10 +10,6 @@ terraform {
     dynamodb_table = "alxeks1table"
   }
 }
-
-/*module "vpc" {
-  source = "./modules/vpc"
-}*/
 
 # creates LetsEncrypt certificate and links it with Route53 host zone
 module "certificate" {
