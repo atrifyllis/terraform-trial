@@ -11,3 +11,14 @@ variable "lets_encrypt_url" {
   default = "https://acme-staging-v02.api.letsencrypt.org/directory"
 }
 
+variable "cluster_name" {
+  default = "dev.senik.tk"
+}
+
+variable "dns_zone" {
+  default = "senik.tk"
+}
+
+variable "machineType" {
+  default = "t3.small"
+}
